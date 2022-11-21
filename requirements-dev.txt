@@ -1,0 +1,15 @@
+black
+numpy==1.23.4
+pandas==1.5.1
+scikit_learn==1.1.3
+tensorflow==2.10.*
+lightgbm==3.3.3
+matplotlib==3.6.2
+gensim==4.2.*
+fastapi==0.87.*
+###############################
+# DEV TOOLS
+###############################
+# https://docs.doppler.com/docs/pycharm
+doppler-env
+pytest
