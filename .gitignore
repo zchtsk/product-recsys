@@ -4,6 +4,7 @@
 # Hide data folder
 data/
 datalake/
+notebooks/
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
