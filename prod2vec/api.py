@@ -1,4 +1,5 @@
 import json
+import os
 from collections import Counter, defaultdict
 from typing import List
 
@@ -6,7 +7,6 @@ import numpy as np
 from flask import Flask
 from flask_cors import CORS
 from sklearn.metrics.pairwise import cosine_similarity
-from starlette.middleware.cors import CORSMiddleware
 
 from prod2vec import main
 from utils import get_minio_client, load_joblib_obj, load_w2v_model, download_numpy
@@ -29,7 +29,7 @@ except:
 app = Flask(__name__)
 cors = CORS(
     app,
-    resources={r"/*": {"origins": ["http://127.0.0.1:5173"]}},
+    resources={r"/*": {"origins": [os.environ["CLIENT_ENDPOINT"]]}},
 )
 
 
@@ -73,8 +73,8 @@ def get_complement_items(orig_basket: List[int], candidate_baskets: List[List[in
 @app.route("/basket/")
 @app.route("/basket/<int:basket_idx>")
 def get_basket_info(basket_idx: int = 0):
-    while basket_idx==0 or sum(basket_encodings[basket_idx])==0 :
-        basket_idx = np.random.randint(1,100_000)
+    while basket_idx == 0 or sum(basket_encodings[basket_idx]) == 0:
+        basket_idx = np.random.randint(1, 100_000)
         items = basket_encodings[basket_idx]
     else:
         items = basket_encodings[basket_idx]
@@ -99,7 +99,7 @@ def get_basket_info(basket_idx: int = 0):
 
     # Find complement items
     bsk_embedding = get_basket_embedding(basket_idx)
-    candidates = get_complement_baskets(bsk_embedding, threshold=.97)
+    candidates = get_complement_baskets(bsk_embedding, threshold=0.97)
     complements = get_complement_items(list(items), candidates)
 
     # Organize Complements by departments
@@ -107,4 +107,9 @@ def get_basket_info(basket_idx: int = 0):
     for itm in complements:
         compl_depts[itm["department_name"]].append(itm)
 
-    return dict(data=departments, also_like=compl_depts, show_also_like=False, basket_id=basket_idx)
+    return dict(
+        data=departments,
+        also_like=compl_depts,
+        show_also_like=False,
+        basket_id=basket_idx,
+    )
