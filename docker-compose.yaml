@@ -21,7 +21,7 @@ services:
       dockerfile: prod2vec/python.Dockerfile
     image: zachtsk/recsys-api
     environment:
-      MINIO_ENDPOINT: minio:9000
+      MINIO_ENDPOINT: ${MINIO_ENDPOINT}
       CLIENT_ENDPOINT: http://127.0.0.1:3000
       MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY}
       MINIO_SECRET_KEY: ${MINIO_SECRET_KEY}
