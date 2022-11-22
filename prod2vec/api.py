@@ -10,21 +10,36 @@ from sklearn.metrics.pairwise import cosine_similarity
 
 from prod2vec import main
 from utils import get_minio_client, load_joblib_obj, load_w2v_model, download_numpy
+import pathlib
 
 ### Preload Models
 try:
+    print("try to connect")
     minio_client = get_minio_client()
+    print("started minio client")
     prod_encoder = load_joblib_obj(minio_client, "product_encoder.pkl")
+    print("loaded encoder")
     prod2vec = load_w2v_model(minio_client, "prod2vec.model")
+    print("loaded w2v")
     basket_encodings = download_numpy(minio_client, "basket_encodings.npy")
+    print("loaded numpy encodings")
     basket_embeddings = download_numpy(minio_client, "basket_embeddings.npy")
+    print("loaded numpy embeddings")
+    print("connected")
 except:
+    print("Trying again...")
     main()
     minio_client = get_minio_client()
+    print("started minio client")
     prod_encoder = load_joblib_obj(minio_client, "product_encoder.pkl")
+    print("loaded encoder")
     prod2vec = load_w2v_model(minio_client, "prod2vec.model")
+    print("loaded w2v")
     basket_encodings = download_numpy(minio_client, "basket_encodings.npy")
+    print("loaded numpy encodings")
     basket_embeddings = download_numpy(minio_client, "basket_embeddings.npy")
+    print("loaded numpy embeddings")
+    print("connected")
 
 app = Flask(__name__)
 cors = CORS(
@@ -32,6 +47,9 @@ cors = CORS(
     resources={r"/*": {"origins": [os.environ["CLIENT_ENDPOINT"]]}},
 )
 
+@app.route("/")
+def hello_world():
+    return "world"
 
 @app.route("/similar/<int:item_idx>")
 def get_similar_items(item_idx: int, threshold: float = 0):
@@ -74,7 +92,7 @@ def get_complement_items(orig_basket: List[int], candidate_baskets: List[List[in
 @app.route("/basket/<int:basket_idx>")
 def get_basket_info(basket_idx: int = 0):
     while basket_idx == 0 or sum(basket_encodings[basket_idx]) == 0:
-        basket_idx = np.random.randint(1, 100_000)
+        basket_idx = np.random.randint(1, 8_500)
         items = basket_encodings[basket_idx]
     else:
         items = basket_encodings[basket_idx]
