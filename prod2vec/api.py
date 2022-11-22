@@ -1,9 +1,11 @@
+import json
 from collections import Counter, defaultdict
 from typing import List
 
 import numpy as np
+from flask import Flask
+from flask_cors import CORS
 from sklearn.metrics.pairwise import cosine_similarity
-from fastapi import FastAPI
 from starlette.middleware.cors import CORSMiddleware
 
 from prod2vec import main
@@ -24,23 +26,14 @@ except:
     basket_encodings = download_numpy(minio_client, "basket_encodings.npy")
     basket_embeddings = download_numpy(minio_client, "basket_embeddings.npy")
 
-app = FastAPI()
-
-origins = [
-    # Local Sveltekit location
-    "http://127.0.0.1:5173"
-]
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=origins,
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+app = Flask(__name__)
+cors = CORS(
+    app,
+    resources={r"/*": {"origins": ["http://127.0.0.1:5173"]}},
 )
 
 
-@app.get("/similar/{item_idx}")
+@app.route("/similar/<int:item_idx>")
 def get_similar_items(item_idx: int, threshold: float = 0):
     orig_item = prod_encoder.decode_product_idx(item_idx)
     similar = prod2vec.wv.most_similar(item_idx, topn=5)
@@ -77,9 +70,14 @@ def get_complement_items(orig_basket: List[int], candidate_baskets: List[List[in
     return [prod_encoder.decode_product_idx(x[0]) for x in items.most_common(5)]
 
 
-@app.get("/basket/{basket_idx}")
+@app.route("/basket/")
+@app.route("/basket/<int:basket_idx>")
 def get_basket_info(basket_idx: int = 0):
-    items = basket_encodings[basket_idx]
+    while basket_idx==0 or sum(basket_encodings[basket_idx])==0 :
+        basket_idx = np.random.randint(1,100_000)
+        items = basket_encodings[basket_idx]
+    else:
+        items = basket_encodings[basket_idx]
     item_descs = []
 
     # Get item descriptions and find item substitutes
@@ -87,7 +85,11 @@ def get_basket_info(basket_idx: int = 0):
         if x > 0:
             data_dict = prod_encoder.decode_product_idx(x)
             data_dict["id"] = int(x)
-            data_dict["subs"] = get_similar_items(x, 0.85)
+            try:
+                data_dict["subs"] = get_similar_items(x, 0.85)
+            except:
+                data_dict["subs"] = []
+            data_dict["show_subs"] = False
             item_descs.append(data_dict)
 
     # Organize Basket by departments
@@ -97,7 +99,12 @@ def get_basket_info(basket_idx: int = 0):
 
     # Find complement items
     bsk_embedding = get_basket_embedding(basket_idx)
-    candidates = get_complement_baskets(bsk_embedding)
-    complements = get_complement_items(items, candidates)
+    candidates = get_complement_baskets(bsk_embedding, threshold=.97)
+    complements = get_complement_items(list(items), candidates)
 
-    return dict(data=departments, also_like=complements)
+    # Organize Complements by departments
+    compl_depts = defaultdict(list)
+    for itm in complements:
+        compl_depts[itm["department_name"]].append(itm)
+
+    return dict(data=departments, also_like=compl_depts, show_also_like=False, basket_id=basket_idx)
