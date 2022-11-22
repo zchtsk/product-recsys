@@ -1,12 +1,6 @@
+import joblib
 import numpy as np
-
-from utils import (
-    get_minio_client,
-    download_dataframe,
-    save_numpy,
-    save_w2v_model,
-    save_joblib_obj,
-)
+import pandas as pd
 
 from gensim.models import Word2Vec
 
@@ -18,9 +12,8 @@ NUM_PRODUCTS = 2000
 
 def main():
     ### Datasets
-    minio_client = get_minio_client()
-    products = download_dataframe(minio_client, "products.csv")
-    orders = download_dataframe(minio_client, "order_products__train.csv")
+    products = pd.read_csv("../datalake/products.csv")
+    orders = pd.read_csv("../datalake/order_products__train.csv")
 
     ### Take in order x product combinations
     ### Return products ranked by number of orders they appear in
@@ -35,7 +28,8 @@ def main():
 
     # Save produce encoder/decoder
     prod_encoder = ProductEncoder(product_ranking, products, num_products=NUM_PRODUCTS)
-    save_joblib_obj(minio_client, prod_encoder, "product_encoder.pkl")
+    with open("../datalake/product_encoder.pkl", "wb") as f:
+        joblib.dump(prod_encoder, f)
 
     ### Aggregate orders
     baskets = (
@@ -47,14 +41,16 @@ def main():
 
     ### Prod2Vec model
     model = Word2Vec(sentences=baskets, vector_size=64, negative=20, seed=42)
-    save_w2v_model(minio_client, model, "prod2vec.model")
+    model.save("../datalake/prod2vec.model")
 
     # Save basket encodings
-    save_numpy(minio_client, baskets.values, "basket_encodings.npy")
+    with open("../datalake/basket_encodings.npy", "wb") as f:
+        np.save(f, np.array(baskets.values), allow_pickle=True)
 
     # Save basket embeddings
     basket_embeddings = [list(np.sum(model.wv[p], axis=0)) for p in baskets]
-    save_numpy(minio_client, basket_embeddings, "basket_embeddings.npy")
+    with open("../datalake/basket_embeddings.npy", "wb") as f:
+        np.save(f, basket_embeddings, allow_pickle=True)
 
 
 if __name__ == "__main__":
