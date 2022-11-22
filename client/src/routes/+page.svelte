@@ -16,7 +16,7 @@
     </div>
     <!--Main Content-->
     <div class="max-w-6xl mx-auto">
-        <div class="py-10 flex justify-center items-center gap-3">
+        <div class="py-6 flex justify-center items-center gap-3">
             <p class="text-4xl tracking-tight text-center text-gray-800">See recommended add-ons and substitutes</p>
         </div>
         <!-- Generator -->
