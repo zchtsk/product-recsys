@@ -1,5 +1,6 @@
 # IDE
 .idea/
+ci/
 
 # Hide data folder
 data/
