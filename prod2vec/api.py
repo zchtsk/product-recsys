@@ -4,6 +4,7 @@ from typing import List
 import numpy as np
 from sklearn.metrics.pairwise import cosine_similarity
 from fastapi import FastAPI
+from starlette.middleware.cors import CORSMiddleware
 
 from prod2vec import main
 from utils import get_minio_client, load_joblib_obj, load_w2v_model, download_numpy
@@ -24,6 +25,19 @@ except:
     basket_embeddings = download_numpy(minio_client, "basket_embeddings.npy")
 
 app = FastAPI()
+
+origins = [
+    # Local Sveltekit location
+    "http://127.0.0.1:5173"
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 @app.get("/similar/{item_idx}")
