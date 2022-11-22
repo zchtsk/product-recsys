@@ -13,4 +13,4 @@ RUN pip install "uvicorn[standard]"
 
 # Run the web service on container startup
 ENV RUNTIME prod
-CMD uvicorn api:app --reload --host 0.0.0.0 --port $PORT --workers 4
+CMD exec gunicorn --bind :$PORT --workers 1 --threads 8 --timeout 0 api:app
