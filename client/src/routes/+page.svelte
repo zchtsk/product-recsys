@@ -1,173 +1,28 @@
 <script>
     import {onMount} from "svelte";
+    import {basket, getNextBasket} from "../components/basket";
+    import {fly} from 'svelte/transition';
 
-    const get_basket = async () => {
-        let response = await fetch('http://127.0.0.1:8000/basket/3');
-        let json = await response.json();
-        console.log(json)
-        return json
-    }
-
-    let jsondata = {
-        "data": {
-            "beverages": [
-                {
-                    "product_id": 24759,
-                    "product_name": "Club Soda",
-                    "aisle_id": 77,
-                    "department_id": 7,
-                    "department_name": "beverages",
-                    "id": 693,
-                    "subs": []
-                },
-                {
-                    "product_id": 8475,
-                    "product_name": "Diet 12 Oz Ginger Ale",
-                    "aisle_id": 77,
-                    "department_id": 7,
-                    "department_name": "beverages",
-                    "id": 1422,
-                    "subs": [
-                        {
-                            "product_id": 42731,
-                            "product_name": "Original Citrus Sparkling Flavored Soda",
-                            "aisle_id": 77,
-                            "department_id": 7,
-                            "department_name": "beverages"
-                        },
-                        {
-                            "product_id": 31808,
-                            "product_name": "Lemon-Lime 12 Pack Soda",
-                            "aisle_id": 77,
-                            "department_id": 7,
-                            "department_name": "beverages"
-                        },
-                        {
-                            "product_id": 47877,
-                            "product_name": "Coke Zero",
-                            "aisle_id": 77,
-                            "department_id": 7,
-                            "department_name": "beverages"
-                        },
-                        {
-                            "product_id": 49198,
-                            "product_name": "Zero Soda",
-                            "aisle_id": 77,
-                            "department_id": 7,
-                            "department_name": "beverages"
-                        },
-                        {
-                            "product_id": 12140,
-                            "product_name": "Diet Soda",
-                            "aisle_id": 77,
-                            "department_id": 7,
-                            "department_name": "beverages"
-                        }
-                    ]
-                }
-            ],
-            "dairy eggs": [
-                {
-                    "product_id": 1263,
-                    "product_name": "American Cheese Slices 12 Count",
-                    "aisle_id": 21,
-                    "department_id": 16,
-                    "department_name": "dairy eggs",
-                    "id": 1115,
-                    "subs": [
-                        {
-                            "product_id": 22788,
-                            "product_name": "Singles American Cheese Slices",
-                            "aisle_id": 21,
-                            "department_id": 16,
-                            "department_name": "dairy eggs"
-                        }
-                    ]
-                }
-            ],
-            "snacks": [
-                {
-                    "product_id": 14381,
-                    "product_name": "Whole Grain Cheddar Baked Goldfish Crackers",
-                    "aisle_id": 78,
-                    "department_id": 19,
-                    "department_name": "snacks",
-                    "id": 1887,
-                    "subs": []
-                },
-                {
-                    "product_id": 18721,
-                    "product_name": "Baked Rice and Corn Puffs, Aged White Cheddar",
-                    "aisle_id": 107,
-                    "department_id": 19,
-                    "department_name": "snacks",
-                    "id": 1402,
-                    "subs": []
-                }
-            ]
-        },
-        "also_like": [
-            {
-                "product_id": 24852,
-                "product_name": "Banana",
-                "aisle_id": 24,
-                "department_id": 4,
-                "department_name": "produce"
-            },
-            {
-                "product_id": 23909,
-                "product_name": "2% Reduced Fat Milk",
-                "aisle_id": 84,
-                "department_id": 16,
-                "department_name": "dairy eggs"
-            },
-            {
-                "product_id": 16953,
-                "product_name": "Creamy Peanut Butter",
-                "aisle_id": 88,
-                "department_id": 13,
-                "department_name": "pantry"
-            },
-            {
-                "product_id": 47141,
-                "product_name": "Cola",
-                "aisle_id": 77,
-                "department_id": 7,
-                "department_name": "beverages"
-            },
-            {
-                "product_id": 5077,
-                "product_name": "100% Whole Wheat Bread",
-                "aisle_id": 112,
-                "department_id": 3,
-                "department_name": "bakery",
-                "id": 53,
-                "subs": []
-            }
-        ]
-    }
-    onMount(()=>{
-        for (const [key, value] of Object.entries(jsondata["data"])){
-            console.log(key)
-        }
+    onMount(async () => {
+        await getNextBasket()
     })
 
 </script>
 
 <main class="h-screen">
     <!-- Navigation -->
-    <div class="border py-5 pl-12">
-        <p class="font-bold text-3xl text-gray-700">Product Recommender</p>
+    <div class="border py-3 pl-12 bg-gray-100">
+        <p class="font-bold text-2xl text-gray-700">Product Recommender</p>
     </div>
     <!--Main Content-->
     <div class="max-w-6xl mx-auto">
         <div class="py-10 flex justify-center items-center gap-3">
-            <p class="text-4xl tracking-tight text-center text-gray-800">Load a sample basket and see recommended
-                options</p>
+            <p class="text-4xl tracking-tight text-center text-gray-800">See recommended add-ons and substitutes</p>
         </div>
         <!-- Generator -->
         <div class="flex justify-center">
-            <button class="border border-gray-300 px-5 py-4 rounded-lg shadow-md flex items-center gap-2 active:translate-y-[1px] hover:shadow-lg">
+            <button on:click={async ()=>{await getNextBasket()}}
+                    class="border border-gray-300 px-5 py-4 rounded-lg shadow-md flex items-center gap-2 active:translate-y-[1px] hover:shadow-lg">
                 <div class="bg-teal-400 text-white rounded-full p-2">
                     <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"
                          xmlns="http://www.w3.org/2000/svg">
@@ -178,65 +33,91 @@
                 <p class="text-2xl text-gray-800">Choose random basket</p>
             </button>
         </div>
-        <!-- Basket -->
-        <div class="flex justify-center">
-            <div class="px-4 sm:px-6 lg:px-8">
-
+        <!-- Recommendations -->
+        <div class="flex justify-center pb-24">
+            <div class="relative px-4 sm:px-6 lg:px-8">
                 <div class="mt-8 flex flex-col">
-                    <div class="-my-2 -mx-4 overflow-x-auto sm:-mx-6 lg:-mx-8">
+                    <div class="-my-2 -mx-4 sm:-mx-6 lg:-mx-8">
                         <div class="inline-block min-w-full py-2 align-middle md:px-6 lg:px-8">
-                            <div class="overflow-hidden shadow ring-1 ring-black ring-opacity-5 md:rounded-lg">
+                            <div class="shadow ring-1 ring-black ring-opacity-5">
                                 <table class="min-w-full">
                                     <thead class="bg-white">
                                     <tr>
                                         <th scope="col"
-                                            class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6">
-                                            Basket #3
+                                            class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900">
+                                            <div>
+                                                Basket #{$basket.basket_id}
+                                                {#if "also_like" in $basket && Object.entries($basket["also_like"]).length > 0}
+                                                    {#if !$basket["show_also_like"]}
+                                                        <button on:click={()=>{$basket["show_also_like"] = !$basket["show_also_like"]}}
+                                                                class="bg-teal-100 px-2 py-1 rounded border border-teal-500 ml-1.5 hover:bg-teal-200">
+                                                            Recommendations available
+                                                        </button>
+                                                    {:else}
+                                                        <button on:click={()=>{$basket["show_also_like"] = !$basket["show_also_like"]}}
+                                                                class="bg-rose-100 px-2 py-1 rounded border border-rose-500 ml-1.5 hover:bg-rose-200">
+                                                            Hide recommendations
+                                                        </button>
+                                                    {/if}
+                                                {:else}
+                                                    <p class="text-gray-400">No recommended add-ons for this basket</p>
+                                                {/if}
+                                            </div>
                                         </th>
                                     </tr>
                                     </thead>
                                     <tbody class="bg-white">
-
-                                    <tr class="border-t border-gray-200">
-                                        <th colspan="5" scope="colgroup"
-                                            class="bg-gray-50 px-4 py-2 text-left text-sm font-semibold text-gray-900 sm:px-6">
-                                            Edinburgh
-                                        </th>
-                                    </tr>
-
-                                    <tr class="border-t border-gray-300">
-                                        <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6">
-                                            Lindsay Walton
-                                        </td>
-                                        <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">Front-end
-                                            Developer
-                                        </td>
-                                        <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                                            lindsay.walton@example.com
-                                        </td>
-                                        <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">Member</td>
-                                        <td class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
-                                            <a href="#" class="text-indigo-600 hover:text-indigo-900">Edit<span
-                                                    class="sr-only">, Lindsay Walton</span></a>
-                                        </td>
-                                    </tr>
-
-                                    <tr class="border-t border-gray-200">
-                                        <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6">
-                                            Courtney Henry
-                                        </td>
-                                        <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">Designer</td>
-                                        <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                                            courtney.henry@example.com
-                                        </td>
-                                        <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">Admin</td>
-                                        <td class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
-                                            <a href="#" class="text-indigo-600 hover:text-indigo-900">Edit<span
-                                                    class="sr-only">, Courtney Henry</span></a>
-                                        </td>
-                                    </tr>
-
-                                    <!-- More people... -->
+                                    {#if "data" in $basket}
+                                        {#each Object.entries($basket["data"]) as [dept, products]}
+                                            <tr class="border-t border-gray-200">
+                                                <th colspan="5" scope="colgroup"
+                                                    class="bg-gray-100 px-4 py-2 text-left text-sm font-semibold text-gray-900">
+                                                    {dept}
+                                                </th>
+                                            </tr>
+                                            {#each products as prod}
+                                                <tr class="border-t border-gray-300">
+                                                    <td class="whitespace-nowrap py-2 pl-4 pr-3 text-sm text-gray-900">
+                                                        {prod.product_name.toLowerCase()}
+                                                    </td>
+                                                    <td class="whitespace-nowrap px-3 py-2 text-sm text-gray-500 italic">
+                                                        {prod.aisle_name}
+                                                    </td>
+                                                    {#if prod.subs.length > 0}
+                                                        <td class="relative whitespace-nowrap py-2 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
+                                                            <button on:click={()=>{prod.show_subs = !prod.show_subs}}
+                                                                    class="border border-gray-300 px-2 py-1.5 rounded hover:text-teal-500">
+                                                                {#if prod.show_subs}
+                                                                    <p class="text-sm text-red-500">Hide Substitutes</p>
+                                                                {:else}
+                                                                    <p class="text-sm">Show Substitutes</p>
+                                                                {/if}
+                                                            </button>
+                                                            {#if prod.show_subs}
+                                                                <div transition:fly class="absolute -right-3 -top-1">
+                                                                    <div class="absolute border rounded justify-start text-start pb-1 bg-white shadow-sm">
+                                                                        <!-- Header -->
+                                                                        <div class="flex justify-left items-end gap-1.5 px-3">
+                                                                            <p class="text-gray-800 text-lg text-teal-500 self-end">
+                                                                                Substitutes for</p>
+                                                                            <span class="text-gray-800 font-medium pb-0.5">{prod.product_name.toLowerCase()}</span>
+                                                                        </div>
+                                                                        <!-- Items -->
+                                                                        <ul class="list-none">
+                                                                            {#each prod.subs as sub}
+                                                                                <li class="px-3 py-1 font-light text-md">
+                                                                                    - {sub.product_name.toLowerCase()} </li>
+                                                                            {/each}
+                                                                        </ul>
+                                                                    </div>
+                                                                </div>
+                                                            {/if}
+                                                        </td>
+                                                    {/if}
+                                                </tr>
+                                            {/each}
+                                        {/each}
+                                    {/if}
                                     </tbody>
                                 </table>
                             </div>
@@ -244,7 +125,49 @@
                     </div>
                 </div>
             </div>
-
+            {#if "also_like" in $basket && Object.entries($basket["also_like"]).length > 0 && $basket["show_also_like"]}
+                <div transition:fly class="left-10 px-4 sm:px-6 lg:px-8">
+                    <div class="mt-8 flex flex-col">
+                        <div class="-my-2 -mx-4 sm:-mx-6 lg:-mx-8">
+                            <div class="inline-block min-w-full py-2 align-middle md:px-6 lg:px-8">
+                                <div class="shadow ring-1 ring-black ring-opacity-5">
+                                    <table class="min-w-full">
+                                        <thead class="bg-white">
+                                        <tr>
+                                            <th scope="col"
+                                                class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-teal-500">
+                                                <p class="py-1 min-w-20">Recommended with this basket</p>
+                                            </th>
+                                        </tr>
+                                        </thead>
+                                        <tbody class="bg-white">
+                                        {#if "also_like" in $basket}
+                                            {#each Object.entries($basket["also_like"]) as [compl_dept, compl_product]}
+                                                <tr class="border-t border-gray-200">
+                                                    <th colspan="5" scope="colgroup"
+                                                        class="bg-gray-100 px-4 py-2 text-left text-sm font-semibold text-gray-900">
+                                                        {compl_dept}
+                                                    </th>
+                                                </tr>
+                                                {#each compl_product as prod}
+                                                    <tr class="border-t border-gray-300">
+                                                        <td class="whitespace-nowrap py-2 pl-4 pr-3 text-sm text-gray-900">
+                                                            {prod.product_name.toLowerCase()}
+                                                        </td>
+                                                        <td class="whitespace-nowrap px-3 py-2 text-sm text-gray-500 italic">
+                                                            {prod.aisle_name}
+                                                        </td>
+                                                    </tr>
+                                                {/each}
+                                            {/each}
+                                        {/if}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {/if}
         </div>
-    </div>
 </main>
