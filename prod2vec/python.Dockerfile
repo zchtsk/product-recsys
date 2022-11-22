@@ -7,9 +7,15 @@ ENV APP_HOME /app
 WORKDIR $APP_HOME
 
 # Install core requirements
+COPY prod2vec/requirements.txt .
+RUN pip install -r requirements.txt
+
+# Copy Module
 COPY prod2vec .
-RUN pip install --no-cache-dir -r requirements.txt
-RUN pip install "uvicorn[standard]"
+
+# Copy Artifacts
+RUN mkdir -p /datalake
+COPY datalake /datalake
 
 # Run the web service on container startup
 ENV RUNTIME prod
