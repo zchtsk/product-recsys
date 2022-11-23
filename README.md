@@ -12,7 +12,7 @@ We can also perform simple recommendations by summing up the product embeddings 
 
 (2) Product Embedding
 * Import transaction information.
-* Group by unique orders and collect a list of unique items in that order.
+* Group by order_id and collect a list of unique items in that order.
 * Use our Product Mapping Dictionary to translate product_ids to rank order ids.
 * At this point you should have a list of customer baskets, and each basket should have your converted product IDs.
 * This will be the input for training our Word2Vec model and generating embeddings.
