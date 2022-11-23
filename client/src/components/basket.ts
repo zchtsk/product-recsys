@@ -6,7 +6,7 @@ const API_URL = env.PUBLIC_API_ENDPOINT
 export const basket = writable({});
 
 export async function getNextBasket() {
-    fetch(`${API_URL}/basket/`).then(async (response) => {
+    await fetch(`${API_URL}/basket/`).then(async (response) => {
         if (response.status == 200) {
             let json = await response.json();
             basket.set(json)
