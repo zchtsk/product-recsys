@@ -3,7 +3,7 @@ This project looks at grocery retail transaction data and applies a Word2Vec mod
 Similarity between items can then be determined with cosine similarity scores to generate lists of substitutes. 
 We can also use these embeddings to compare entire baskets to each other, and then look for items that similar shoppers purchased.
 
-Live demo can be accessed [**here**](https://recsys-client-7zy464zyhq-uc.a.run.app/)
+Live demo can be accessed [**here**](https://recsys.tsklp.co/)
 
 https://user-images.githubusercontent.com/109352381/203448258-11fb6807-33cc-4482-81b7-220765c9ee0a.mp4
 
