@@ -3,6 +3,11 @@ This project looks at grocery retail transaction data and applies a Word2Vec mod
 Similarity between items can then be determined with cosine similarity scores, to generate lists of substitutes. 
 We can also perform simple recommendations by summing up the product embeddings within a given basket and comparing this to other baskets, then looking for items similar shoppers purchased.
 
+Live demo can be accessed [**here**](https://recsys-client-7zy464zyhq-uc.a.run.app/)
+
+https://user-images.githubusercontent.com/109352381/203448258-11fb6807-33cc-4482-81b7-220765c9ee0a.mp4
+
+
 # Process
 (1) Product Mapping Dictionary
 * Import transaction information.
