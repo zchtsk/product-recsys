@@ -63,13 +63,15 @@ def get_complement_baskets(basket_embedding, threshold=0.95):
     return similar_baskets
 
 
-def get_complement_items(orig_basket: List[int], candidate_baskets: List[List[int]]):
+def get_complement_items(
+    orig_basket: List[int], candidate_baskets: List[List[int]], nitems: int = 5
+):
     items = Counter()
     for bsk in candidate_baskets:
         for itm in bsk:
             if itm > 0 and itm not in orig_basket:
                 items[itm] += 1
-    return [prod_encoder.decode_product_idx(x[0]) for x in items.most_common(5)]
+    return [prod_encoder.decode_product_idx(x[0]) for x in items.most_common(nitems)]
 
 
 @app.route("/basket/")
@@ -88,7 +90,7 @@ def get_basket_info(basket_idx: int = 0):
             data_dict = prod_encoder.decode_product_idx(x)
             data_dict["id"] = int(x)
             try:
-                data_dict["subs"] = get_similar_items(x, 0.90)
+                data_dict["subs"] = get_similar_items(x, 0.85)
             except:
                 data_dict["subs"] = []
             data_dict["show_subs"] = False
@@ -101,8 +103,8 @@ def get_basket_info(basket_idx: int = 0):
 
     # Find complement items
     bsk_embedding = get_basket_embedding(basket_idx)
-    candidates = get_complement_baskets(bsk_embedding, threshold=0.975)
-    complements = get_complement_items(list(items), candidates)
+    candidates = get_complement_baskets(bsk_embedding, threshold=0.97)
+    complements = get_complement_items(list(items), candidates, 4)
 
     # Organize Complements by departments
     compl_depts = defaultdict(list)
