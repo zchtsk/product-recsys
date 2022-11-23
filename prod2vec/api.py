@@ -27,6 +27,7 @@ app = Flask(__name__)
 cors = CORS(
     app,
     resources={r"/*": {"origins": [os.environ["CLIENT_ENDPOINT"]]}},
+    support_credentials=True
 )
 
 
