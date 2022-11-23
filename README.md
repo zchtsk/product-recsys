@@ -1,7 +1,7 @@
 # Grocery Product Recommendations
 This project looks at grocery retail transaction data and applies a Word2Vec model to generate embeddings for individual products. 
-Similarity between items can then be determined with cosine similarity scores, to generate lists of substitutes. 
-We can also perform simple recommendations by summing up the product embeddings within a given basket and comparing this to other baskets, then looking for items similar shoppers purchased.
+Similarity between items can then be determined with cosine similarity scores to generate lists of substitutes. 
+We can also use these embeddings to compare entire baskets to each other, and then look for items that similar shoppers purchased.
 
 Live demo can be accessed [**here**](https://recsys-client-7zy464zyhq-uc.a.run.app/)
 
