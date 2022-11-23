@@ -7,7 +7,7 @@ from gensim.models import Word2Vec
 from decoder import ProductEncoder
 
 ### GLOBALS
-NUM_PRODUCTS = 2000
+NUM_PRODUCTS = 3000
 
 
 def main():
