@@ -9,6 +9,37 @@
         startup = false;
     })
 
+    // Computed property to merge recommendations into categories
+    $: mergedData = (() => {
+        if (!$basket.data) return {};
+        
+        // Create a deep copy of the original data
+        const merged = JSON.parse(JSON.stringify($basket.data));
+        
+        // Add recommendations to their respective categories if show_also_like is true
+        if ($basket.also_like && $basket.show_also_like) {
+            Object.entries($basket.also_like).forEach(([dept, recommendations]) => {
+                // Mark recommendations with a special flag for styling
+                const styledRecommendations = recommendations.map(rec => ({
+                    ...rec,
+                    is_recommendation: true,
+                    subs: [], // Recommendations don't have substitutes
+                    show_subs: false
+                }));
+                
+                if (merged[dept]) {
+                    // Add to existing category
+                    merged[dept] = [...merged[dept], ...styledRecommendations];
+                } else {
+                    // Create new category for recommendations
+                    merged[dept] = styledRecommendations;
+                }
+            });
+        }
+        
+        return merged;
+    })();
+
 </script>
 
 <main class="h-screen">
@@ -53,8 +84,8 @@
                                                     {#if "also_like" in $basket && Object.entries($basket["also_like"]).length > 0}
                                                         {#if !$basket["show_also_like"]}
                                                             <button on:click={()=>{$basket["show_also_like"] = !$basket["show_also_like"]}}
-                                                                    class="bg-teal-100 px-2 py-1 rounded border border-teal-500 ml-1.5 hover:bg-teal-200">
-                                                                Recommendations available
+                                                                    class="bg-green-100 px-2 py-1 rounded border border-green-500 ml-1.5 hover:bg-green-200">
+                                                                Show recommendations
                                                             </button>
                                                         {:else}
                                                             <button on:click={()=>{$basket["show_also_like"] = !$basket["show_also_like"]}}
@@ -71,8 +102,8 @@
                                         </tr>
                                         </thead>
                                         <tbody class="bg-white">
-                                        {#if "data" in $basket}
-                                            {#each Object.entries($basket["data"]) as [dept, products]}
+                                        {#if Object.keys(mergedData).length > 0}
+                                            {#each Object.entries(mergedData) as [dept, products]}
                                                 <tr class="border-t border-gray-200">
                                                     <th colspan="5" scope="colgroup"
                                                         class="bg-gray-100 px-4 py-2 text-left text-sm font-semibold text-gray-900">
@@ -80,14 +111,23 @@
                                                     </th>
                                                 </tr>
                                                 {#each products as prod}
-                                                    <tr class="border-t border-gray-300">
-                                                        <td class="whitespace-nowrap py-2 pl-4 pr-3 text-sm text-gray-900">
-                                                            {prod.product_name.toLowerCase()}
+                                                    <tr class="border-t border-gray-300 {prod.is_recommendation ? 'bg-green-50 border-green-200' : ''}">
+                                                        <td class="whitespace-nowrap py-2 pl-4 pr-3 text-sm {prod.is_recommendation ? 'text-green-800 font-medium' : 'text-gray-900'}">
+                                                            {#if prod.is_recommendation}
+                                                                <span class="inline-flex items-center gap-1">
+                                                                    <svg class="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                                                                    </svg>
+                                                                    {prod.product_name.toLowerCase()}
+                                                                </span>
+                                                            {:else}
+                                                                {prod.product_name.toLowerCase()}
+                                                            {/if}
                                                         </td>
-                                                        <td class="whitespace-nowrap px-3 py-2 text-sm text-gray-500 italic">
+                                                        <td class="whitespace-nowrap px-3 py-2 text-sm {prod.is_recommendation ? 'text-green-600 italic' : 'text-gray-500 italic'}">
                                                             {prod.aisle_name}
                                                         </td>
-                                                        {#if prod.subs.length > 0}
+                                                        {#if prod.subs && prod.subs.length > 0}
                                                             <td class="relative whitespace-nowrap py-2 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
                                                                 <button on:click={()=>{prod.show_subs = !prod.show_subs}}
                                                                         class="border border-gray-300 px-2 py-1.5 rounded hover:text-teal-500">
@@ -119,6 +159,12 @@
                                                                     </div>
                                                                 {/if}
                                                             </td>
+                                                        {:else if prod.is_recommendation}
+                                                            <td class="whitespace-nowrap py-2 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
+                                                                <span class="px-2 py-1 text-xs bg-green-100 text-green-800 rounded-full">
+                                                                    Recommended
+                                                                </span>
+                                                            </td>
                                                         {/if}
                                                     </tr>
                                                 {/each}
@@ -131,50 +177,6 @@
                         </div>
                     </div>
                 </div>
-                {#if "also_like" in $basket && Object.entries($basket["also_like"]).length > 0 && $basket["show_also_like"]}
-                    <div transition:fly class="left-10 px-4 sm:px-6 lg:px-8">
-                        <div class="mt-8 flex flex-col">
-                            <div class="-my-2 -mx-4 sm:-mx-6 lg:-mx-8">
-                                <div class="inline-block min-w-full py-2 align-middle md:px-6 lg:px-8">
-                                    <div class="shadow ring-1 ring-black ring-opacity-5">
-                                        <table class="min-w-full">
-                                            <thead class="bg-white">
-                                            <tr>
-                                                <th scope="col"
-                                                    class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-teal-500">
-                                                    <p class="py-1 min-w-20">Recommended with this basket</p>
-                                                </th>
-                                            </tr>
-                                            </thead>
-                                            <tbody class="bg-white">
-                                            {#if "also_like" in $basket}
-                                                {#each Object.entries($basket["also_like"]) as [compl_dept, compl_product]}
-                                                    <tr class="border-t border-gray-200">
-                                                        <th colspan="5" scope="colgroup"
-                                                            class="bg-gray-100 px-4 py-2 text-left text-sm font-semibold text-gray-900">
-                                                            {compl_dept}
-                                                        </th>
-                                                    </tr>
-                                                    {#each compl_product as prod}
-                                                        <tr class="border-t border-gray-300">
-                                                            <td class="whitespace-nowrap py-2 pl-4 pr-3 text-sm text-gray-900">
-                                                                {prod.product_name.toLowerCase()}
-                                                            </td>
-                                                            <td class="whitespace-nowrap px-3 py-2 text-sm text-gray-500 italic">
-                                                                {prod.aisle_name}
-                                                            </td>
-                                                        </tr>
-                                                    {/each}
-                                                {/each}
-                                            {/if}
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                {/if}
             </div>
         {:else}
             <div role="status" class="flex items-center justify-center">

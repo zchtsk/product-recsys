@@ -24,11 +24,7 @@ basket_embeddings = np.load(
 )
 
 app = Flask(__name__)
-cors = CORS(
-    app,
-    resources={r"/*": {"origins": [os.environ["CLIENT_ENDPOINT"]]}},
-    support_credentials=True
-)
+cors = CORS(app)
 
 
 @app.route("/")
@@ -75,14 +71,60 @@ def get_complement_items(
     return [prod_encoder.decode_product_idx(x[0]) for x in items.most_common(nitems)]
 
 
+def has_substitutes(basket_items):
+    """Check if any products in the basket have substitutes"""
+    for x in basket_items:
+        if x > 0:
+            try:
+                subs = get_similar_items(x, 0.85)
+                if len(subs) > 0:
+                    return True
+            except:
+                continue
+    return False
+
+
+def has_recommendations(basket_idx, basket_items):
+    """Check if the basket has recommendation items (also_like)"""
+    try:
+        bsk_embedding = get_basket_embedding(basket_idx)
+        candidates = get_complement_baskets(bsk_embedding, threshold=0.97)
+        complements = get_complement_items(list(basket_items), candidates, 4)
+        return len(complements) > 0
+    except:
+        return False
+
+
 @app.route("/basket/")
 @app.route("/basket/<int:basket_idx>")
 def get_basket_info(basket_idx: int = 0):
-    while basket_idx == 0 or sum(basket_encodings[basket_idx]) == 0:
-        basket_idx = np.random.randint(1, 8_500)
+    max_attempts = 100  # Prevent infinite loops
+    attempts = 0
+    
+    while attempts < max_attempts:
+        # Generate random basket if not specified
+        if basket_idx == 0:
+            basket_idx = np.random.randint(1, 8_500)
+        
         items = basket_encodings[basket_idx]
-    else:
+        
+        # Skip empty baskets or baskets without substitutes
+        if sum(items) == 0:
+            basket_idx = 0  # Reset to generate new random basket
+            attempts += 1
+            continue
+            
+        # Check if this basket has both substitutes and recommendations
+        if has_substitutes(items) and has_recommendations(basket_idx, items):
+            break
+            
+        basket_idx = 0  # Reset to generate new random basket
+        attempts += 1
+    
+    # If we couldn't find a suitable basket after max attempts, use the last one anyway
+    if attempts >= max_attempts:
         items = basket_encodings[basket_idx]
+    
     item_descs = []
 
     # Get item descriptions and find item substitutes

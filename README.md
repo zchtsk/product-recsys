@@ -71,6 +71,93 @@ idx_similar = np.array(
 ### Find products purchased in similar baskets...
 ![ApplicationFrameHost_Tor7XqarRj](https://user-images.githubusercontent.com/109352381/203446383-f65773ca-b1a1-4dcc-a21f-a4fe4cfb0f51.png)
 
+# Quick Start with Docker
+
+## Prerequisites
+- Docker and Docker Compose installed
+- Make utility (or run commands manually)
+
+## Setup and Run
+
+1. **Clone the repository:**
+```bash
+git clone <your-repo-url>
+cd product-recsys
+```
+
+2. **Start the application:**
+```bash
+make up
+```
+
+The first startup will automatically:
+- Download the Instacart dataset (~3GB)
+- Train the Word2Vec model 
+- Start the API server
+
+Subsequent startups will skip training and start immediately.
+
+The application will be available at:
+- Frontend: http://localhost:3000
+- API: http://localhost:5000
+
+## Available Make Commands
+
+### Data and Training
+- `make download-data` - Download dataset manually (optional)
+- `make download-kaggle` - Download dataset using Kaggle CLI (optional)
+- `make setup-venv` - Set up Python virtual environment (optional)
+- `make train` - Train the product recommendation model manually (optional)
+
+*Note: Data download and training happen automatically within Docker containers on first startup.*
+
+### Docker Operations
+- `make up` - Start all services (local development)
+- `make up-prod` - Start all services (production)
+- `make down` - Stop all services
+- `make down-prod` - Stop production services
+- `make build` - Build Docker images
+- `make build-prod` - Build production Docker images
+- `make logs` - View application logs
+- `make logs-prod` - View production logs
+
+## Architecture
+
+The system consists of two Docker services:
+
+### Local Development
+- **API Server** (Python/Flask) - Port 5000
+- **Client** (SvelteKit/Node.js) - Port 3000  
+- Frontend connects to: `http://localhost:5000`
+
+### Production Deployment
+- **API Server** (Python/Flask) - Port 5000
+- **Client** (SvelteKit/Node.js) - Port 3000
+- Frontend connects to: `https://api.product-recsys.zchtsk.com`
+
+# Features
+
+## Recommendation Types
+The system provides two types of recommendations:
+
+### 1. Product Substitutes
+- Find similar products within the same aisle
+- Based on Word2Vec similarity scores
+- Helps users discover alternatives to products in their basket
+
+### 2. Basket Recommendations  
+- Suggest complementary items based on shopping patterns
+- Uses basket embedding similarity to find items frequently purchased together
+- Displayed as green-highlighted rows integrated within categories
+
+## Smart Basket Selection
+- Only shows baskets that have both substitutes AND recommendations
+- Ensures every basket provides meaningful, actionable suggestions
+- Prevents empty recommendation experiences
+
 # Development Notes
-* Using "Kaggle Market Basket Analysis" dataset, which can be found [here](https://www.kaggle.com/competitions/instacart-market-basket-analysis/data)
-* Unzip and make sure the `products.csv` and `orders.csv` files are in the `datalake` folder
+* Using "Kaggle Market Basket Analysis" dataset from [Instacart Market Basket Analysis](https://www.kaggle.com/c/instacart-market-basket-analysis)
+* Dataset is automatically downloaded and processed within Docker containers on first startup
+* Trained models are persisted in Docker volumes for fast subsequent startups
+* Simplified architecture with embedded data - no external storage dependencies
+* Built with uv for fast, reliable Python dependency management

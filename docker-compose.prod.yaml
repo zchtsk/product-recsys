@@ -19,9 +19,14 @@ services:
       context: .
       dockerfile: client/node.Dockerfile
     environment:
-      PUBLIC_API_ENDPOINT: http://localhost:5000
+      PUBLIC_API_ENDPOINT: https://api.product-recsys.zchtsk.com
     ports:
       - "3000:3000"
     depends_on:
       - prodrecsys-api
     restart: unless-stopped
+
+networks:
+  default:
+    external: true
+    name: firehose_nginx

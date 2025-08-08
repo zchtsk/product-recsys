@@ -1,62 +1,49 @@
 REGION = us-central1
 
-###### MINIO DEPLOYMENT
-tag_s3:
-	docker commit minio gcr.io/$(GCP_PROJECT)/recsys-s3:latest
+###### DATA DOWNLOAD AND TRAINING
+download-data:
+	@echo "Downloading Instacart dataset..."
+	uv run python scripts/download_data.py
 
-push_s3:
-	docker push gcr.io/$(GCP_PROJECT)/recsys-s3:latest
+download-kaggle:
+	@echo "Downloading dataset using Kaggle CLI..."
+	./scripts/download_kaggle.sh
 
-launch_s3: push_s3
-	gcloud run services replace ci/minio_service.yaml --region=$(REGION)
+setup-venv:
+	@echo "Setting up Python environment with uv..."
+	uv sync
 
-public_s3: launch_s3
-	gcloud run services set-iam-policy recsys-minio ci/policy.yaml --region=$(REGION) --quiet
+train:
+	@echo "Training product recommendation model..."
+	cd prod2vec && uv run python prod2vec.py
 
-deploy_s3: public_s3
-	echo "Minio Deployed"
+setup: download-data setup-venv
+	@echo "Setup complete!"
 
-remove_s3:
-	gcloud run services delete recsys-minio --region=$(REGION) --quiet
+train-full: setup train
+	@echo "Full training pipeline complete!"
 
-###### API DEPLOYMENT
-tag_api:
-	docker tag zachtsk/recsys-api gcr.io/$(GCP_PROJECT)/recsys-api:latest
+###### DOCKER COMMANDS
+up:
+	docker-compose up -d
 
-push_api: tag_api
-	docker push gcr.io/$(GCP_PROJECT)/recsys-api:latest
+up-prod:
+	docker-compose -f docker-compose.prod.yaml up -d
 
-launch_api: push_api
-	gcloud run services replace ci/api_service.yaml --region=$(REGION)
+down:
+	docker-compose down
 
-public_api: launch_api
-	gcloud run services set-iam-policy recsys-api ci/policy.yaml --region=$(REGION) --quiet
+down-prod:
+	docker-compose -f docker-compose.prod.yaml down
 
-deploy_api: public_api
-	echo "API Deployed"
+build:
+	docker-compose build
 
-remove_api:
-	gcloud run services delete recsys-api --region=$(REGION) --quiet
+build-prod:
+	docker-compose -f docker-compose.prod.yaml build
 
-###### CLIENT
-tag_client:
-	docker tag zachtsk/recsys-client gcr.io/$(GCP_PROJECT)/recsys-client:latest
+logs:
+	docker-compose logs -f
 
-push_client: tag_client
-	docker push gcr.io/$(GCP_PROJECT)/recsys-client:latest
-
-launch_client: push_client
-	gcloud run services replace ci/client_service.yaml --region=$(REGION)
-
-public_client: launch_client
-	gcloud run services set-iam-policy recsys-client ci/policy.yaml --region=$(REGION) --quiet
-
-deploy_client: public_client
-	echo "Client Deployed"
-
-remove_client:
-	gcloud run services delete recsys-client --region=$(REGION) --quiet
-
-###### CLOUD RUN SERVICE FILE BUILDER
-build_service:
-	python -m scripts.build_service_yamls
+logs-prod:
+	docker-compose -f docker-compose.prod.yaml logs -f
