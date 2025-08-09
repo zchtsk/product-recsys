@@ -101,39 +101,11 @@ The application will be available at:
 - Frontend: http://localhost:3000
 - API: http://localhost:5000
 
-## Available Make Commands
-
-### Data and Training
-- `make download-data` - Download dataset manually (optional)
-- `make download-kaggle` - Download dataset using Kaggle CLI (optional)
-- `make setup-venv` - Set up Python virtual environment (optional)
-- `make train` - Train the product recommendation model manually (optional)
-
-*Note: Data download and training happen automatically within Docker containers on first startup.*
-
-### Docker Operations
-- `make up` - Start all services (local development)
-- `make up-prod` - Start all services (production)
-- `make down` - Stop all services
-- `make down-prod` - Stop production services
-- `make build` - Build Docker images
-- `make build-prod` - Build production Docker images
-- `make logs` - View application logs
-- `make logs-prod` - View production logs
-
 ## Architecture
 
 The system consists of two Docker services:
-
-### Local Development
 - **API Server** (Python/Flask) - Port 5000
 - **Client** (SvelteKit/Node.js) - Port 3000  
-- Frontend connects to: `http://localhost:5000`
-
-### Production Deployment
-- **API Server** (Python/Flask) - Port 5000
-- **Client** (SvelteKit/Node.js) - Port 3000
-- Frontend connects to: `https://api.product-recsys.zchtsk.com`
 
 # Features
 
@@ -150,14 +122,5 @@ The system provides two types of recommendations:
 - Uses basket embedding similarity to find items frequently purchased together
 - Displayed as green-highlighted rows integrated within categories
 
-## Smart Basket Selection
-- Only shows baskets that have both substitutes AND recommendations
-- Ensures every basket provides meaningful, actionable suggestions
-- Prevents empty recommendation experiences
-
 # Development Notes
 * Using "Kaggle Market Basket Analysis" dataset from [Instacart Market Basket Analysis](https://www.kaggle.com/c/instacart-market-basket-analysis)
-* Dataset is automatically downloaded and processed within Docker containers on first startup
-* Trained models are persisted in Docker volumes for fast subsequent startups
-* Simplified architecture with embedded data - no external storage dependencies
-* Built with uv for fast, reliable Python dependency management
