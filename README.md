@@ -2,6 +2,7 @@
 This project looks at grocery retail transaction data and applies a Word2Vec model to generate embeddings for individual products. 
 
 Live demo can be accessed [**here**](https://product-recsys.zchtsk.com/)
+
 https://user-images.githubusercontent.com/109352381/203448258-11fb6807-33cc-4482-81b7-220765c9ee0a.mp4
 
 
