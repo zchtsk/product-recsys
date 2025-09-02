@@ -1,5 +1,5 @@
 # Grocery Product Recommendations
-This project looks at grocery retail transaction data and applies a Word2Vec model to generate embeddings for individual products. 
+Generate recommended products or substitues using information embedded in customer purchase history.
 
 Live demo can be accessed [**here**](https://product-recsys.zchtsk.com/)
 
