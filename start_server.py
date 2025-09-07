@@ -58,7 +58,7 @@ def start_api_server():
             "gunicorn", 
             "--bind", f":{port}",
             "--workers", "1",
-            "--threads", "8", 
+            "--threads", "2",
             "--timeout", "0",
             "api:app"
         ], check=True, cwd="/app")
