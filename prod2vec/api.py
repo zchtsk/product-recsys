@@ -17,10 +17,10 @@ root_path = pathlib.Path(__file__).parent
 prod_encoder = joblib.load(str(root_path / "../datalake/product_encoder.pkl"))
 prod2vec = Word2Vec.load(str(root_path / "../datalake/prod2vec.model"))
 basket_encodings = np.load(
-    str(root_path / "../datalake/basket_encodings.npy"), allow_pickle=True
+    str(root_path / "../datalake/basket_encodings.npy"), allow_pickle=True, mmap_mode='r'
 )
 basket_embeddings = np.load(
-    str(root_path / "../datalake/basket_embeddings.npy"), allow_pickle=True
+    str(root_path / "../datalake/basket_embeddings.npy"), allow_pickle=True, mmap_mode='r'
 )
 
 app = Flask(__name__)

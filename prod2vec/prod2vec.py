@@ -52,6 +52,12 @@ def main():
     with open("../datalake/basket_embeddings.npy", "wb") as f:
         np.save(f, basket_embeddings, allow_pickle=True)
 
+    # Clean up large objects and force garbage collection
+    del orders, product_ranking, baskets, basket_embeddings, model
+    import gc
+    gc.collect()
+    print("✅ Training data cleaned from memory")
+
 
 if __name__ == "__main__":
     main()

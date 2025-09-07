@@ -41,6 +41,10 @@ def train_model():
             "python", "prod2vec.py"
         ], check=True, cwd="/app", capture_output=True, text=True)
         print("✅ Model training completed successfully")
+        
+        # Force garbage collection to release training memory
+        import gc
+        gc.collect()
         return True
     except subprocess.CalledProcessError as e:
         print(f"❌ Error training model: {e}")
