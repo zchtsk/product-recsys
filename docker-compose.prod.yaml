@@ -20,8 +20,6 @@ services:
       dockerfile: client/node.Dockerfile
     environment:
       PUBLIC_API_ENDPOINT: https://api.product-recsys.zchtsk.com
-    ports:
-      - "3000:3000"
     depends_on:
       - prodrecsys-api
     restart: unless-stopped

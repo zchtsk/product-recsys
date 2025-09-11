@@ -24,4 +24,4 @@ COPY datalake /datalake
 
 # Run the web service on container startup
 ENV RUNTIME prod
-CMD exec uv run gunicorn --bind :$PORT --workers 1 --threads 8 --timeout 0 api:app
+CMD exec uv run gunicorn --bind :$PORT --workers 1 --threads 2 --timeout 0 api:app
