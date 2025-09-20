@@ -1,8 +1,6 @@
 # Grocery Product Recommendations
 Generate recommended products or substitues using information embedded in customer purchase history.
 
-Live demo can be accessed [**here**](https://product-recsys.zchtsk.com/)
-
 https://user-images.githubusercontent.com/109352381/203448258-11fb6807-33cc-4482-81b7-220765c9ee0a.mp4
 
 # Process
